@@ -1,12 +1,13 @@
 <!--
  * @Author: canlong.shen 562172151@qq.com
- * @Date: 2023-01-05 18:06:00
+ * @Date: 2023-01-06 18:10:58
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-06 18:08:43
- * @FilePath: \test-com\src\components\HelloWorld.vue
- * @Description:  进度条滑块
+ * @LastEditTime: 2023-01-06 18:11:40
+ * @FilePath: \test-com\src\components\lg-base-progress.vue
+ * @Description: 进度条组件
  * 
 -->
+
 
 
 <template>
