@@ -2,7 +2,7 @@
  * @Author: canlong.shen 562172151@qq.com
  * @Date: 2023-01-05 18:06:00
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-06 18:08:43
+ * @LastEditTime: 2023-01-07 09:42:42
  * @FilePath: \test-com\src\components\HelloWorld.vue
  * @Description:  进度条滑块
  * 
@@ -135,21 +135,21 @@ export default {
       }
       return style;
     },
-    cacheStyleGet(){
+    cacheStyleGet() {
       const style = {};
-      const { curCacheScale ,curProgressWidth } = this;
+      const { curCacheScale, curProgressWidth } = this;
       if (curCacheScale) {
-         style.width = `${ parseInt( curProgressWidth * curCacheScale , 10)}px`;
+        style.width = `${parseInt(curProgressWidth * curCacheScale, 10)}px`;
       }
-      console.log('cacheStyleGet',style);
+      console.log("cacheStyleGet", style);
       return style;
-    }
+    },
   },
-  watch:{
-    cacheScale(v){
-       this.curCacheScale = v
-    }
-  }, 
+  watch: {
+    cacheScale(v) {
+      this.curCacheScale = v;
+    },
+  },
   methods: {
     /**
      * @Author: canlong.shen
@@ -193,7 +193,7 @@ export default {
       this.$nextTick(() => {
         const evolveEl = this.$refs.BASE_PROGRESS_SLIDER_EL;
         this.curSliderEl = evolveEl;
-        const { mousedownEvent, mouseupEvent, mouseupEventWindow } = this;
+        const { mousedownEvent, mouseupEvent, mouseupEventWindow ,resizeEventWindow} = this;
         evolveEl.addEventListener("mousedown", mousedownEvent, {
           capture: true,
           passive: true,
@@ -207,7 +207,31 @@ export default {
           capture: true,
           passive: true,
         });
+        window.addEventListener("resize", resizeEventWindow, {
+          capture: true,
+          passive: true,
+        });
       });
+    },
+    /**
+     * @Author: canlong.shen
+     * @description: 视口发送变动了
+     * @default:
+     * @return {*}
+     */
+    resizeEventWindow() {
+      this.setProgressWidth()
+    },
+    /**
+     * @Author: canlong.shen
+     * @description: 设置滚动条的长度
+     * @default:
+     * @return {*}
+     */
+    setProgressWidth() {
+      const { width } =
+        this.curProgressEl.getBoundingClientRect();
+      this.curProgressWidth = width;
     },
 
     /**
@@ -247,7 +271,7 @@ export default {
         const mx = e.pageX || e.clientX;
         const my = e.pageY || e.clientY;
         this.curTop = my - this.curDifferTop;
-        const progressWidth  = this.curProgressWidth
+        const progressWidth = this.curProgressWidth;
         let left = mx - this.curDifferLeft;
         const startLeft = 0;
         const endLeft = progressWidth;
@@ -294,10 +318,10 @@ export default {
       this.$nextTick(() => {
         this.curProgressEl = this.$refs.BASE_PROGRESS_EL;
         this.curEvolveEl = this.$refs.BASE_PROGRESS_EVOLVE_EL;
-        this.curCacheEl = this.$refs.BASE_PROGRESS_CACHE_EL
+        this.curCacheEl = this.$refs.BASE_PROGRESS_CACHE_EL;
         const { width: progressWidth } =
           this.curProgressEl.getBoundingClientRect();
-        this.curProgressWidth = progressWidth
+        this.curProgressWidth = progressWidth;
       });
     },
   },
@@ -342,7 +366,7 @@ export default {
   height: inherit;
   position: absolute;
   border-radius: inherit;
-  background-color:rgba(230, 228, 228, 1);
+  background-color: rgba(230, 228, 228, 1);
 }
 
 .base_progress_evolve {

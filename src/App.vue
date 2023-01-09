@@ -1,17 +1,23 @@
 <template>
   <div id="app">
-    {{ curValue }} {{ curCacheScale }}
-    <HelloWorld v-model="curValue" :cacheScale="curCacheScale" />
+    <!-- S 进度条 -->
+    <BsgBaseProgress v-model="curValue" :cacheScale="curCacheScale" />
+    <!-- E 进度条 -->
+    <!-- S 播放组件 -->
+    <el-button @click="handlePlay">播放</el-button>
+    <BsgBaseWeb265 ref="BSG_BASE_WEB265_EL" />
+    <!-- E 播放组件 -->
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-
+import BsgBaseProgress from "./components/bsg-base-progress.vue";
+import BsgBaseWeb265 from "./components/lg-base-web265.vue";
 export default {
   name: "App",
   components: {
-    HelloWorld,
+    BsgBaseProgress,
+    BsgBaseWeb265,
   },
   data() {
     return {
@@ -28,7 +34,20 @@ export default {
     //     i = 0;
     //   }
     // }, 1000);
+    
   },
+  mounted(){
+    // this.$refs.BSG_BASE_WEB265_EL.initPlayer()
+    this.handlePlay()
+  },
+  methods:{
+    handlePlay(){
+
+      console.log('播放了');
+      this.$refs.BSG_BASE_WEB265_EL.initPlayer()
+
+    }
+  }
 };
 </script>
 
