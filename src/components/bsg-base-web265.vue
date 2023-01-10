@@ -3,7 +3,7 @@
  * @Author: canlong.shen 562172151@qq.com
  * @Date: 2023-01-04 15:30:26
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-10 16:13:25
+ * @LastEditTime: 2023-01-10 17:56:55
  * @FilePath: \test-com\src\components\bsg-base-web265.vue
  * @Description: 
  * 
@@ -85,7 +85,10 @@
             <BsgBaseWeb265Control
               @on-play="play"
               @on-pause="pause"
+              @on-previous="triggerPrevious"
+              @on-next="triggerNext"
               :totalTime="totalTimeGet"
+              :playTime="playingTimeGet"
             />
           </div>
           <!-- / 视频控制按钮 -->
@@ -148,6 +151,7 @@ export default {
       curDuration: 0, // 视频时常
       curCacheScale: 0, // 缓存器进度条
       curProgressScale: 0, // 播放器进度条
+      curPlayingTime: 0, //正在播放时间
     };
   },
   computed: {
@@ -158,22 +162,27 @@ export default {
       return !this.curPlaying;
     },
     durationSecondGet() {
-      return parseInt(this.curDuration / 1000, 10);
+      const { convertInt, curDuration } = this;
+      return convertInt(curDuration);
     },
     /**
      * 视频总时常
      */
     totalTimeGet() {
-      const { curDuration = 0 } = this;
-      const secondDur = parseInt(curDuration / 1000, 10); // 转换为秒
-      const oriHour = secondDur / (60 * 60);
-      const hour = parseInt(oriHour, 10);
-      const oriMinute = (oriHour % 1) * 60;
-      const minute = parseInt(oriMinute, 10);
-      const second = (oriMinute % 1) * 60;
-      return `${hour ? (hour < 10 ? `0${hour}` : hour) : "00"}:${
-        minute ? (minute < 10 ? `0${minute}` : minute) : "00"
-      }:${second ? (second < 10 ? `0${second}` : second) : "00"}`;
+      const { durationSecondGet = 0 } = this;
+      return this.transTime(durationSecondGet);
+    },
+    /**
+     * 当前播放时间
+     */
+    playingTimeGet() {
+      const {
+        curProgressScale = 0,
+        curPlayingTime = 0,
+        totalTimeGet = "",
+        transTime,
+      } = this;
+      return curProgressScale === 1 ? totalTimeGet : transTime(curPlayingTime);
     },
   },
   watch: {
@@ -192,6 +201,73 @@ export default {
     this.closeDialog();
   },
   methods: {
+    /**
+     * @Author: canlong.shen
+     * @description: 调整 seek 节点
+     * @default:
+     * @return {*}
+     */
+    adjustSeekPoint(offset = 0) {
+      const {
+        curInstance: playerObj,
+        curPlayingTime: playingTime,
+        durationSecondGet,
+      } = this;
+      let playSecond = playingTime + offset;
+
+      if (playSecond <= 0) {
+        playSecond = 0;
+      }
+
+      if (playSecond >= durationSecondGet) {
+        playSecond = durationSecondGet;
+      }
+
+      playerObj.seek(playSecond);
+    },
+    /**
+     * @Author: canlong.shen
+     * @description: 快退
+     * @default:
+     * @return {*}
+     */
+    triggerPrevious() {
+      this.adjustSeekPoint(-10);
+    },
+    /**
+     * @Author: canlong.shen
+     * @description: 快进
+     * @default:
+     * @return {*}
+     */
+    triggerNext() {
+      this.adjustSeekPoint(10);
+    },
+    /**
+     * @Author: canlong.shen
+     * @description: 转为整数
+     * @default:
+     * @return {*}
+     */
+    convertInt(v = 0) {
+      return parseInt(v / 1000, 10);
+    },
+    /**
+     * @Author: canlong.shen
+     * @description:
+     * @default:
+     * @return {*}
+     */
+    transTime(secondDur = 0) {
+      const oriHour = secondDur / (60 * 60);
+      const hour = parseInt(oriHour, 10);
+      const oriMinute = (oriHour % 1) * 60;
+      const minute = parseInt(oriMinute, 10);
+      const second = parseInt((oriMinute % 1) * 60, 10);
+      return `${hour ? (hour < 10 ? `0${hour}` : hour) : "00"}:${
+        minute ? (minute < 10 ? `0${minute}` : minute) : "00"
+      }:${second ? (second < 10 ? `0${second}` : second) : "00"}`;
+    },
     /**
      * @Author: canlong.shen
      * @description: 调节视频进度
@@ -274,12 +350,13 @@ export default {
       // 播放器当前播放PTS时刻更新
       playerObj.onPlayTime = (pts) => {
         // console.log("onPlayTime ", "播放器当前播放PTS时刻更新", pts);
-        const playTotalSecond = parseInt(this.curDuration / 1000, 10);
+        const playTotalSecond = this.durationSecondGet;
         if (pts >= playTotalSecond) {
           this.curProgressScale = 1;
         } else {
           this.curProgressScale = pts / playTotalSecond;
         }
+        this.curPlayingTime = pts;
       };
       // 播放器媒体播放结束事件
       playerObj.onPlayFinish = () => {
@@ -288,7 +365,7 @@ export default {
       // 播放器缓冲进度回调
       playerObj.onCacheProcess = (cPts) => {
         // 当前缓冲进度时间
-        const playTotalSecond = parseInt(this.curDuration / 1000, 10);
+        const playTotalSecond = this.durationSecondGet;
 
         if (cPts >= playTotalSecond) {
           this.curCacheScale = 1;

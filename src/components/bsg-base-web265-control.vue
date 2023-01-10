@@ -2,7 +2,7 @@
  * @Author: canlong.shen 562172151@qq.com
  * @Date: 2023-01-09 16:50:33
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-10 10:57:48
+ * @LastEditTime: 2023-01-10 17:41:48
  * @FilePath: \test-com\src\components\bsg-base-web265-control.vue
  * @Description: 控制面板组件
  * 
@@ -45,19 +45,28 @@ export default {
   props: {
     totalTime: {
       type: [String, Number],
+      default: "00:00:00",
+    },
+    playTime: {
+      type: [String, Number],
+      default: "00:00:00",
     },
   },
   components: {},
   data() {
     return {
-      curPlayTime: "00:00:00",
-      curTotalTime: "00:00:00",
+      curTotalTime: this.totalTime,
+      curPlayTime: this.playTime,
     };
   },
   watch: {
     totalTime(v) {
       console.log("totalTime", v);
       this.curTotalTime = v;
+    },
+    playTime(v) {
+      // console.log("curPlayTime", v);
+      this.curPlayTime = v;
     },
   },
   methods: {
@@ -88,8 +97,9 @@ export default {
      * @return {*}
      */
     handlePrevious() {
-      console.log("快进");
+      console.log("快退");
       this.$emit("on-previous");
+      
     },
     /**
      * @Author: canlong.shen
@@ -98,7 +108,7 @@ export default {
      * @return {*}
      */
     handleNext() {
-      console.log("快退");
+      console.log("快进");
       this.$emit("on-next");
     },
   },
