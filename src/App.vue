@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- S 进度条 -->
-    <BsgBaseProgress v-model="curValue" :cacheScale="curCacheScale" />
+    <!-- <BsgBaseProgress v-model="curValue" :cacheScale="curCacheScale" /> -->
     <!-- E 进度条 -->
     <!-- S 播放组件 -->
     <el-button @click="handlePlay">播放</el-button>
@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import BsgBaseProgress from "./components/bsg-base-progress.vue";
-import BsgBaseWeb265 from "./components/lg-base-web265.vue";
+// import BsgBaseProgress from "./components/bsg-base-progress.vue";
+import BsgBaseWeb265 from "./components/bsg-base-web265.vue";
 export default {
   name: "App",
   components: {
-    BsgBaseProgress,
+    // BsgBaseProgress,
     BsgBaseWeb265,
   },
   data() {

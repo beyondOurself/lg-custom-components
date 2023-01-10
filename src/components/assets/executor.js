@@ -7,6 +7,7 @@ const PRESET_CONFIG = {
   extInfo: {
     moovStartFlag: true,
   },
+  // autoPlay:true
 };
 
 // FYI. the Player class is a wrapper container provide the init and destory methods.

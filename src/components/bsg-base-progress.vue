@@ -2,8 +2,8 @@
  * @Author: canlong.shen 562172151@qq.com
  * @Date: 2023-01-06 18:10:58
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-07 09:46:59
- * @FilePath: \test-com\src\components\lg-base-progress.vue
+ * @LastEditTime: 2023-01-10 16:35:07
+ * @FilePath: \test-com\src\components\bsg-base-progress.vue
  * @Description: 进度条组件
  * 
 -->
@@ -77,6 +77,30 @@ export default {
       type: [String, Number],
       default: 0,
     },
+    /**
+     * 播放条进度值
+     */
+    progressScale: {
+      type: [String, Number],
+      default: 0,
+    },
+    /**
+     * 是否完成 seek
+     */
+    seekFinish: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * @Author: canlong.shen
+     * @description: 组件标识
+     * @default:
+     * @return {*}
+     */
+    flag: {
+      type: String,
+      default: "",
+    },
   },
   model: {
     prop: "value",
@@ -95,10 +119,12 @@ export default {
       curDifferLeft: 0, // 初始鼠标点 x 值 与 拖拽元素 let值的 差值
       curTop: 0, // 当前的top值
       curCacheScale: this.cacheScale, // 缓存条进度值
+      curProgressScale: this.progressScale, // 播放进度值
       curLeft: this.value, // 当前left 值
       curSliderWidth: this.sliderWidth, // 滑块的宽度
       curValue: this.value, // 刻度的值
       curProgressWidth: 0, // 进度条的总体长度
+      curSeekFinish: this.seekFinish, // 是否 seek 完成
     };
   },
   computed: {
@@ -126,6 +152,7 @@ export default {
       if (progressHeight) {
         style.height = `${progressHeight}px`;
       }
+
       return style;
     },
     evolveStyleGet() {
@@ -142,7 +169,7 @@ export default {
       if (curCacheScale && curCacheScale <= 1) {
         style.width = `${parseInt(curProgressWidth * curCacheScale, 10)}px`;
       }
-      console.log("cacheStyleGet", style);
+      // console.log("cacheStyleGet", style);
       return style;
     },
   },
@@ -150,8 +177,30 @@ export default {
     cacheScale(v) {
       this.curCacheScale = v;
     },
+    progressScale(scale) {
+      const { curProgressWidth, curIsMove, curSeekFinish } = this;
+      if (scale && scale <= 1 && !curIsMove && curSeekFinish) {
+        this.curLeft = `${parseInt(curProgressWidth * scale, 10)}`;
+      }
+      this.curProgressScale = scale;
+    },
+    sliderWidth(v) {
+      this.curSliderWidth = v;
+    },
+    seekFinish(v) {
+      this.curSeekFinish = v;
+    },
   },
   methods: {
+    /**
+     * @Author: canlong.shen
+     * @description: 设置是否完成seek
+     * @default:
+     * @return {*}
+     */
+    setSeekFinish(v) {
+      this.curSeekFinish = v;
+    },
     /**
      * @Author: canlong.shen
      * @description:  移除事件
@@ -160,12 +209,7 @@ export default {
      */
     releaseEvent() {
       const evolveEl = this.curSliderEl;
-      const {
-        mousedownEvent,
-        mouseupEvent,
-        mousemoveEventWindow,
-        mouseupEventWindow,
-      } = this;
+      const { mousedownEvent, mouseupEvent, mousemoveEventWindow } = this;
       evolveEl.removeEventListener("mousedown", mousedownEvent, {
         capture: true,
         passive: true,
@@ -175,10 +219,6 @@ export default {
         passive: true,
       });
       evolveEl.removeEventListener("mouseup", mouseupEvent, {
-        capture: true,
-        passive: true,
-      });
-      window.removeEventListener("mouseup", mouseupEventWindow, {
         capture: true,
         passive: true,
       });
@@ -194,12 +234,7 @@ export default {
       this.$nextTick(() => {
         const evolveEl = this.$refs.BASE_PROGRESS_SLIDER_EL;
         this.curSliderEl = evolveEl;
-        const {
-          mousedownEvent,
-          mouseupEvent,
-          mouseupEventWindow,
-          resizeEventWindow,
-        } = this;
+        const { mousedownEvent, mouseupEvent, resizeEventWindow } = this;
         evolveEl.addEventListener("mousedown", mousedownEvent, {
           capture: true,
           passive: true,
@@ -209,10 +244,7 @@ export default {
           capture: true,
           passive: true,
         });
-        window.addEventListener("mouseup", mouseupEventWindow, {
-          capture: true,
-          passive: true,
-        });
+
         window.addEventListener("resize", resizeEventWindow, {
           capture: true,
           passive: true,
@@ -227,7 +259,7 @@ export default {
      * @return {*}
      */
     resizeEventWindow() {
-      this.setProgressWidth();
+      // this.setProgressWidth();
     },
     /**
      * @Author: canlong.shen
@@ -236,10 +268,8 @@ export default {
      * @return {*}
      */
     setProgressWidth() {
-      this.$nextTick(() => {
-        const { width } = this.curProgressEl.getBoundingClientRect();
-        this.curProgressWidth = width;
-      });
+      const { width } = this.curProgressEl.getBoundingClientRect();
+      this.curProgressWidth = width;
     },
 
     /**
@@ -249,8 +279,15 @@ export default {
      * @return {*}
      */
     mousedownEvent(e) {
-      const { mousemoveEventWindow } = this;
+      const { mousemoveEventWindow, mouseupEventWindow } = this;
+      this.setProgressWidth();
+      this.curSeekFinish = false;
       window.addEventListener("mousemove", mousemoveEventWindow, {
+        capture: true,
+        passive: true,
+      });
+
+      window.addEventListener("mouseup", mouseupEventWindow, {
         capture: true,
         passive: true,
       });
@@ -264,8 +301,6 @@ export default {
       const ey = curEl.offsetTop;
       this.curDifferLeft = mx - ex;
       this.curDifferTop = my - ey;
-      // console.log("this.curDifferLeft", this.curDifferLeft);
-      // console.log("this.curDifferTop", this.curDifferTop);
     },
     /**
      * @Author: canlong.shen
@@ -288,9 +323,10 @@ export default {
         } else if (left >= endLeft) {
           left = endLeft;
         }
+        this.curLeft = left;
         this.curValue = parseInt((left / progressWidth) * 100);
         this.$emit("change", this.curValue);
-        this.curLeft = left;
+        this.$emit("on-change", this.curValue);
       }
     },
     /**
@@ -310,11 +346,17 @@ export default {
      */
     mouseupEventWindow() {
       this.curIsMove = false;
-      const { mousemoveEventWindow } = this;
+      const { mousemoveEventWindow, curValue, flag, mouseupEventWindow } = this;
       window.removeEventListener("mousemove", mousemoveEventWindow, {
         capture: true,
         passive: true,
       });
+
+      window.removeEventListener("mouseup", mouseupEventWindow, {
+        capture: true,
+        passive: true,
+      });
+      this.$emit("on-up", curValue, flag);
     },
     /**
      * @Author: canlong.shen
@@ -338,7 +380,9 @@ export default {
     init() {
       this.addEvent();
       this.initEl();
-      this.setProgressWidth();
+      setTimeout(() => {
+        this.setProgressWidth();
+      }, 1000);
     },
   },
   created() {
@@ -353,6 +397,9 @@ export default {
 <style scoped>
 /* 自定义样式
 ---------------------------------------------------------------- */
+.bsg-base-progress {
+  width: 100%;
+}
 .base_progress_wrap {
   display: flex;
   position: relative;
@@ -369,8 +416,8 @@ export default {
 .base_progress_slider {
   position: absolute;
   border-radius: 50%;
-  cursor: move;
-  cursor: grabbing;
+  /* cursor: move;
+  cursor: grabbing; */
   /* border: 10px solid transparent;
   background-clip: content-box ; */
   background-color: rgb(255, 250, 250);
@@ -381,8 +428,8 @@ export default {
   height: inherit;
   position: absolute;
   border-radius: inherit;
-  transition: 1s;
-  background-color: rgba(230, 228, 228, 1);
+  /* background-color: rgba(230, 228, 228, 1); */
+  background-color: rgb(24, 236, 95);
 }
 
 .base_progress_evolve {
