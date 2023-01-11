@@ -2,8 +2,8 @@
  * @Author: canlong.shen 562172151@qq.com
  * @Date: 2023-01-09 16:50:33
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-10 17:41:48
- * @FilePath: \test-com\src\components\bsg-base-web265-control.vue
+ * @LastEditTime: 2023-01-11 10:24:49
+ * @FilePath: \smart-cloud-fe-common\src\components\base\bsg-base-web265-control.vue
  * @Description: 控制面板组件
  * 
 -->
@@ -28,6 +28,9 @@
         </div>
         <div class="web265_control_button_wrap" @click="handleNext">
           <img class="web265_control_button" src="./assets/next.svg" alt="" />
+        </div>
+        <div class="web265_control_button_wrap" @click="handleCircle">
+          <img class="web265_control_button" src="./assets/circle.svg" alt="" />
         </div>
       </div>
       <!-- E 操作按钮 -->
@@ -111,6 +114,18 @@ export default {
       console.log("快进");
       this.$emit("on-next");
     },
+    /**
+     * @Author: canlong.shen
+     * @description: 后退
+     * @default:
+     * @return {*}
+     */
+    handleCircle() {
+      console.log("循环");
+      this.$emit("on-circle");
+    },
+
+
   },
 
   mounted() {},

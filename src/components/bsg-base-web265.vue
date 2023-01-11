@@ -3,19 +3,15 @@
  * @Author: canlong.shen 562172151@qq.com
  * @Date: 2023-01-04 15:30:26
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-11 09:49:00
- * @FilePath: \test-com\src\components\bsg-base-web265.vue
+ * @LastEditTime: 2023-01-11 10:38:52
+ * @FilePath: \smart-cloud-fe-common\src\components\base\bsg-base-web265.vue
  * @Description: 
  * 
 -->
 
 <template>
   <div class="bsg-base-web265">
-    <div
-      v-show="curDialogVisible"
-      class="base_web265_wrap"
-      @click.self="handleDialogMask"
-    >
+    <div v-if="curDialogVisible" class="base_web265_wrap" @click.self="handleDialogMask">
       <div class="base_web265_wrap_container">
         <!-- S 头部操作面板 -->
         <div class="base_web26_header">
@@ -30,20 +26,10 @@
           <!-- S 头部操作按钮面板 -->
           <div class="base_web26_header_button">
             <!-- S 全屏按钮 -->
-            <img
-              class="web26_header_button_item"
-              style="height: 20px; width: 20px"
-              src="./assets/full.svg"
-              @click="handleFullIcon"
-            />
+            <img class="web26_header_button_item" style="height: 20px; width: 20px" src="./assets/full.svg" @click="handleFullIcon" />
             <!-- E 全屏按钮 -->
             <!-- / 关闭按钮 -->
-            <img
-              class="web26_header_button_item"
-              style="height: 20px; width: 20px"
-              src="./assets/close.svg"
-              @click="handleCloseIcon"
-            />
+            <img class="web26_header_button_item" style="height: 20px; width: 20px" src="./assets/close.svg" @click="handleCloseIcon" />
             <!-- / 关闭按钮 -->
           </div>
 
@@ -98,6 +84,7 @@
               @on-pause="pause"
               @on-previous="triggerPrevious"
               @on-next="triggerNext"
+              @on-circle="triggerCircle"
               :totalTime="totalTimeGet"
               :playTime="playingTimeGet"
             />
@@ -111,17 +98,17 @@
 </template>
 
 <script>
-import { Player } from "./assets/executor";
-import BsgBaseWeb265Volume from "./bsg-base-web265-volume";
-import BsgBaseProgress from "./bsg-base-progress";
-import BsgBaseWeb265Control from "./bsg-base-web265-control";
-import BsgBaseWeb265Loading from "./bsg-base-web265-loading";
+import { Player } from './assets/executor'
+import BsgBaseWeb265Volume from './bsg-base-web265-volume'
+import BsgBaseProgress from './bsg-base-progress'
+import BsgBaseWeb265Control from './bsg-base-web265-control'
+import BsgBaseWeb265Loading from './bsg-base-web265-loading'
 
 export default {
-  name: "BsgBaseWeb265",
+  name: 'BsgBaseWeb265',
   model: {
-    prop: "visible",
-    event: "change",
+    prop: 'visible',
+    event: 'change',
   },
   props: {
     /**
@@ -136,14 +123,14 @@ export default {
      */
     url: {
       type: String,
-      default: "",
+      default: '',
     },
     /**
      * 视频名称
      */
     name: {
       type: String,
-      default: "",
+      default: '',
     },
   },
 
@@ -155,8 +142,7 @@ export default {
   },
   data() {
     return {
-      curUrl:
-        "http://bsgoalsmartcloud.oss-cn-shenzhen.aliyuncs.com/AccessControl/7ebac135579e4892b5e7daa8b6f8b0fa.mp4",
+      curUrl: 'http://bsgoalsmartcloud.oss-cn-shenzhen.aliyuncs.com/AccessControl/7ebac135579e4892b5e7daa8b6f8b0fa.mp4',
       curInstance: null,
       curDialogVisible: this.visible,
       curPlayer: null,
@@ -167,66 +153,62 @@ export default {
       curProgressScale: 0, // 播放器进度条
       curPlayingTime: 0, //正在播放时间
       curLoading: false, // 缓存加载的loading
-      curHint: "", // 提示内容
+      curHint: '', // 提示内容
       curHintTimeout: null, //提示内容定时器
-    };
+      curCircleStatus: true, // 循环播放
+    }
   },
   computed: {
     /**
      * 播放状态
      */
     playingStatusGet() {
-      return !this.curPlaying;
+      return !this.curPlaying
     },
     durationSecondGet() {
-      const { convertInt, curDuration } = this;
-      return convertInt(curDuration);
+      const { convertInt, curDuration } = this
+      return convertInt(curDuration)
     },
     /**
      * 视频总时常
      */
     totalTimeGet() {
-      const { durationSecondGet = 0 } = this;
-      return this.transTime(durationSecondGet);
+      const { durationSecondGet = 0 } = this
+      return this.transTime(durationSecondGet)
     },
     /**
      * 当前播放时间
      */
     playingTimeGet() {
-      const {
-        curProgressScale = 0,
-        curPlayingTime = 0,
-        totalTimeGet = "",
-        transTime,
-      } = this;
-      return curProgressScale === 1 ? totalTimeGet : transTime(curPlayingTime);
+      const { curProgressScale = 0, curPlayingTime = 0, totalTimeGet = '', transTime } = this
+      return curProgressScale === 1 ? totalTimeGet : transTime(curPlayingTime)
     },
   },
   watch: {
     visible(v) {
-      this.curDialogVisible = v;
+      this.curDialogVisible = v
     },
     name(v) {
-      this.curName = v;
+      this.curName = v
     },
     curHint(v) {
       if (v) {
-        const { curHintTimeout: hintTimeout } = this;
+        const { curHintTimeout: hintTimeout } = this
         if (hintTimeout) {
-          clearTimeout(hintTimeout);
+          clearTimeout(hintTimeout)
         }
         this.curHintTimeout = setTimeout(() => {
-          this.curHint = "";
-        }, 3000);
+          this.curHint = ''
+        }, 3000)
       }
     },
   },
   created() {
-    this.init();
+    this.init()
   },
   mounted() {},
   beforeDestroy() {
-    this.closeDialog();
+    this.closeDialog()
   },
   methods: {
     /**
@@ -236,22 +218,18 @@ export default {
      * @return {*}
      */
     adjustSeekPoint(offset = 0) {
-      const {
-        curInstance: playerObj,
-        curPlayingTime: playingTime,
-        durationSecondGet,
-      } = this;
-      let playSecond = playingTime + offset;
+      const { curInstance: playerObj, curPlayingTime: playingTime, durationSecondGet } = this
+      let playSecond = playingTime + offset
 
       if (playSecond <= 0) {
-        playSecond = 0;
+        playSecond = 0
       }
 
       if (playSecond >= durationSecondGet) {
-        playSecond = durationSecondGet;
+        playSecond = durationSecondGet
       }
-      this.curLoading = true;
-      playerObj.seek(playSecond);
+      this.curLoading = true
+      playerObj.seek(playSecond)
     },
     /**
      * @Author: canlong.shen
@@ -260,7 +238,8 @@ export default {
      * @return {*}
      */
     triggerPrevious() {
-      this.adjustSeekPoint(-10);
+      this.adjustSeekPoint(-10)
+      this.curHint = "快退"
     },
     /**
      * @Author: canlong.shen
@@ -269,7 +248,25 @@ export default {
      * @return {*}
      */
     triggerNext() {
-      this.adjustSeekPoint(10);
+      this.adjustSeekPoint(10)
+      this.curHint = "快进"
+    },
+    /**
+     * @Author: canlong.shen
+     * @description: 循环
+     * @default:
+     * @return {*}
+     */
+    triggerCircle() {
+      const { curCircleStatus: circleStatus } = this
+      this.curCircleStatus = !circleStatus
+      // 放开循环则继续播放
+      if (this.curCircleStatus) {
+        this.play()
+        this.curHint = "打开循环播放"
+      }else{
+        this.curHint = "关闭循环播放"
+      }
     },
     /**
      * @Author: canlong.shen
@@ -278,7 +275,7 @@ export default {
      * @return {*}
      */
     convertInt(v = 0) {
-      return parseInt(v / 1000, 10);
+      return parseInt(v / 1000, 10)
     },
     /**
      * @Author: canlong.shen
@@ -287,14 +284,12 @@ export default {
      * @return {*}
      */
     transTime(secondDur = 0) {
-      const oriHour = secondDur / (60 * 60);
-      const hour = parseInt(oriHour, 10);
-      const oriMinute = (oriHour % 1) * 60;
-      const minute = parseInt(oriMinute, 10);
-      const second = parseInt((oriMinute % 1) * 60, 10);
-      return `${hour ? (hour < 10 ? `0${hour}` : hour) : "00"}:${
-        minute ? (minute < 10 ? `0${minute}` : minute) : "00"
-      }:${second ? (second < 10 ? `0${second}` : second) : "00"}`;
+      const oriHour = secondDur / (60 * 60)
+      const hour = parseInt(oriHour, 10)
+      const oriMinute = (oriHour % 1) * 60
+      const minute = parseInt(oriMinute, 10)
+      const second = parseInt((oriMinute % 1) * 60, 10)
+      return `${hour ? (hour < 10 ? `0${hour}` : hour) : '00'}:${minute ? (minute < 10 ? `0${minute}` : minute) : '00'}:${second ? (second < 10 ? `0${second}` : second) : '00'}`
     },
     /**
      * @Author: canlong.shen
@@ -302,17 +297,16 @@ export default {
      * @default:
      * @return {*}
      */
-    triggerProgressUp(v = 0, flag = "") {
-      const { durationSecondGet: durationSecond = 0, curInstance: playerObj } =
-        this;
-      const scale = v ? v / 100 : 0;
-      const playSecond = durationSecond * scale;
+    triggerProgressUp(v = 0, flag = '') {
+      const { durationSecondGet: durationSecond = 0, curInstance: playerObj } = this
+      const scale = v ? v / 100 : 0
+      const playSecond = durationSecond * scale
       if (playerObj) {
-        this.curLoading = true;
-        playerObj.seek(playSecond);
+        this.curLoading = true
+        playerObj.seek(playSecond)
       }
 
-      console.log("triggerProgressUp", flag);
+      console.log('triggerProgressUp', flag)
     },
     /**
      * @Author: canlong.shen
@@ -321,13 +315,13 @@ export default {
      * @return {*}
      */
     changeVolume(v) {
-      const playerObj = this.curInstance;
-      const volumeNum = v / 100;
+      const playerObj = this.curInstance
+      const volumeNum = v / 100
       if (playerObj) {
-        playerObj.setVoice(volumeNum);
-        this.curHint = `音量${v}%`;
+        playerObj.setVoice(volumeNum)
+        this.curHint = `音量${v}%`
       }
-      console.log("音量", volumeNum);
+      console.log('音量', volumeNum)
     },
     /**
      * @Author: canlong.shen
@@ -336,7 +330,7 @@ export default {
      * @return {*}
      */
     handleFullIcon() {
-      this.curInstance.fullScreen();
+      this.curInstance.fullScreen()
     },
 
     /**
@@ -346,7 +340,7 @@ export default {
      * @return {*}
      */
     handleCloseIcon() {
-      this.closeDialog();
+      this.closeDialog()
     },
     /**
      * @Author: canlong.shen
@@ -355,84 +349,86 @@ export default {
      * @return {*}
      */
     initPlayerEvent() {
-      const playerObj = this.curInstance;
+      const playerObj = this.curInstance
       // Seek完成
       playerObj.onSeekFinish = () => {
-        console.log("onSeekFinish", "Seek完成");
+        console.log('onSeekFinish', 'Seek完成')
         // 播放结束重新播放
-        this.play();
-        this.$refs.BASE_PROGRESS_PLAY_EL.setSeekFinish(true);
-        this.curLoading = false;
-      };
+        if (this.curCircleStatus) {
+          this.play()
+        }
+        this.$refs.BASE_PROGRESS_PLAY_EL.setSeekFinish(true)
+        this.curLoading = false
+      }
       // YUV帧数据渲染
       playerObj.onRender = (param) => {
-        console.log("onRender ", "YUV帧数据渲染", param);
-      };
+        console.log('onRender ', 'YUV帧数据渲染', param)
+      }
       // 媒体文件加载完成事件
       // 媒体文件当前加载成功，可以进行播放
       playerObj.onLoadFinish = () => {
-        console.log("onLoadFinish ", "媒体文件加载完成事件");
-        this.play();
-        this.curPlaying = true;
-      };
+        console.log('onLoadFinish ', '媒体文件加载完成事件')
+        this.play()
+        this.curPlaying = true
+      }
       // 播放器当前播放PTS时刻更新
       playerObj.onPlayTime = (pts) => {
         // console.log("onPlayTime ", "播放器当前播放PTS时刻更新", pts);
-        const playTotalSecond = this.durationSecondGet;
+        const playTotalSecond = this.durationSecondGet
         if (pts >= playTotalSecond) {
-          this.curProgressScale = 1;
+          this.curProgressScale = 1
         } else {
-          this.curProgressScale = pts / playTotalSecond;
+          this.curProgressScale = pts / playTotalSecond
         }
-        this.curPlayingTime = pts;
-      };
+        this.curPlayingTime = pts
+      }
       // 播放器媒体播放结束事件
       playerObj.onPlayFinish = () => {
-        console.log("onPlayFinish ", "播放器媒体播放结束事件");
-      };
+        console.log('onPlayFinish ', '播放器媒体播放结束事件')
+      }
       // 播放器缓冲进度回调
       playerObj.onCacheProcess = (cPts) => {
         // 当前缓冲进度时间
-        const playTotalSecond = this.durationSecondGet;
+        const playTotalSecond = this.durationSecondGet
 
         if (cPts >= playTotalSecond) {
-          this.curCacheScale = 1;
+          this.curCacheScale = 1
         } else {
-          this.curCacheScale = cPts / playTotalSecond;
+          this.curCacheScale = cPts / playTotalSecond
         }
 
         // console.log("onCacheProcess", "播放器缓冲进度回调", cPts);
-      };
+      }
 
       // 播放器封面图加载完成
       playerObj.onReadyShowDone = () => {
-        console.log("onReadyShowDone ", "播放器封面图加载完成");
-        this.getMediaInfo();
-      };
+        console.log('onReadyShowDone ', '播放器封面图加载完成')
+        this.getMediaInfo()
+      }
 
       // 当前正在缓存帧数据
       playerObj.onLoadCache = () => {
-        console.log("onLoadCache  ", "当前正在缓存帧数据");
-      };
+        console.log('onLoadCache  ', '当前正在缓存帧数据')
+      }
 
       // 帧数据缓存完成
       playerObj.onLoadCacheFinshed = () => {
-        console.log("onLoadCacheFinshed ", "帧数据缓存完成");
-      };
+        console.log('onLoadCacheFinshed ', '帧数据缓存完成')
+      }
 
       // 开启全屏事件
       playerObj.onOpenFullScreen = () => {
-        console.log("onOpenFullScreen ", "开启全屏事件");
-      };
+        console.log('onOpenFullScreen ', '开启全屏事件')
+      }
 
       // 关闭全屏事件
       playerObj.onCloseFullScreen = () => {
-        console.log("onCloseFullScreen ", "关闭全屏事件");
-      };
+        console.log('onCloseFullScreen ', '关闭全屏事件')
+      }
       // 播放器播放状态
       playerObj.onPlayState = (state) => {
-        console.log("onPlayState ", "播放器播放状态", state);
-      };
+        console.log('onPlayState ', '播放器播放状态', state)
+      }
     },
     /**
      * @Author: canlong.shen
@@ -443,10 +439,10 @@ export default {
     setVisibleValue() {
       // 释放点资源
       if (this.curInstance) {
-        this.curInstance.release();
+        this.curInstance.release()
       }
-      this.curDialogVisible = false;
-      this.$emit("change", false);
+      this.curDialogVisible = false
+      this.$emit('change', false)
     },
     /**
      * @Author: canlong.shen
@@ -455,7 +451,7 @@ export default {
      * @return {*}
      */
     handleDialogMask() {
-      this.closeDialog();
+      this.closeDialog()
     },
     /**
      * @Author: canlong.shen
@@ -463,18 +459,18 @@ export default {
      * @default:
      * @return {*}
      */
-    initPlayer(url = "") {
-      console.log("initPlayer", url);
-      this.curDialogVisible = true;
+    initPlayer(url = '') {
+      console.log('initPlayer', url)
+      this.curDialogVisible = true
       this.$nextTick(() => {
-        const backVideoUrl = url || this.curUrl;
+        const backVideoUrl = url || this.curUrl
         // 初始化事件
-        this.curPlayer.init(backVideoUrl);
-        this.curInstance = this.curPlayer.instance;
-        this.initPlayerEvent();
-        this.curInstance.setRenderScreen(true);
-        this.curPlayer.instance.do();
-      });
+        this.curPlayer.init(backVideoUrl)
+        this.curInstance = this.curPlayer.instance
+        this.initPlayerEvent()
+        this.curInstance.setRenderScreen(true)
+        this.curPlayer.instance.do()
+      })
     },
     /**
      * @Author: canlong.shen
@@ -483,7 +479,7 @@ export default {
      * @return {*}
      */
     closeDialog() {
-      this.setVisibleValue();
+      this.setVisibleValue()
     },
     /**
      * @Author: canlong.shen
@@ -492,16 +488,18 @@ export default {
      * @return {*}
      */
     play() {
-      const playerObj = this.curInstance;
+      const playerObj = this.curInstance
+      this.curHint = "播放"
       // 开始播放
       if (playerObj.isPlaying()) {
         // 正在播放中
-        console.log("正在播放中");
+        console.log('正在播放中')
       } else {
         // 当前是暂停状态
-        console.log("当前是暂停状态");
-        playerObj.play();
+        console.log('当前是暂停状态')
+        playerObj.play()
       }
+
     },
     /**
      * @Author: canlong.shen
@@ -510,10 +508,9 @@ export default {
      * @return {*}
      */
     pause() {
-      const playerObj = this.curInstance;
-      console.log("触发暂停了");
-      console.log("playerObj.isPlaying()", playerObj.isPlaying());
-      this.curInstance.pause();
+      const playerObj = this.curInstance
+      this.curHint = "暂停"
+      playerObj.pause()
     },
 
     /**
@@ -534,9 +531,9 @@ export default {
       // 	videoCodec: 0 // 0:HEVC/H.265 1:其他编码
       // 	isHEVC: true // 是否是H265编码视频
       // videoType: "vod" // 点播vod 直播live
-      const { meta: { durationMs } = {} } = this.curInstance.mediaInfo();
-      this.curDuration = durationMs;
-      console.log("info", this.curDuration);
+      const { meta: { durationMs } = {} } = this.curInstance.mediaInfo()
+      this.curDuration = durationMs
+      console.log('info', this.curDuration)
     },
     /**
      * @Author: canlong.shen
@@ -545,10 +542,10 @@ export default {
      * @return {*}
      */
     init() {
-      this.curPlayer = new Player();
+      this.curPlayer = new Player()
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -558,7 +555,7 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 2;
+  z-index: 999999;
 
   display: flex;
   align-items: center;
