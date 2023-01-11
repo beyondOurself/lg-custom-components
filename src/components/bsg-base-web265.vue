@@ -3,7 +3,7 @@
  * @Author: canlong.shen 562172151@qq.com
  * @Date: 2023-01-04 15:30:26
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-11 09:13:33
+ * @LastEditTime: 2023-01-11 09:49:00
  * @FilePath: \test-com\src\components\bsg-base-web265.vue
  * @Description: 
  * 
@@ -52,7 +52,16 @@
         <!-- E 头部操作面板 -->
         <!-- S 播放内容 -->
         <div id="glplayer" class="glplayer">
+          <!-- / loading 动态效果 -->
           <BsgBaseWeb265Loading :loading="curLoading" />
+          <!-- / loading 动态效果 -->
+
+          <!-- / 数值显示 -->
+          <div class="base_web26_container_hint" v-if="curHint">
+            {{ curHint }}
+          </div>
+
+          <!-- / 数值显示 -->
         </div>
         <!-- E 播放内容 -->
         <!-- S 底部操作面板 -->
@@ -158,6 +167,8 @@ export default {
       curProgressScale: 0, // 播放器进度条
       curPlayingTime: 0, //正在播放时间
       curLoading: false, // 缓存加载的loading
+      curHint: "", // 提示内容
+      curHintTimeout: null, //提示内容定时器
     };
   },
   computed: {
@@ -197,6 +208,17 @@ export default {
     },
     name(v) {
       this.curName = v;
+    },
+    curHint(v) {
+      if (v) {
+        const { curHintTimeout: hintTimeout } = this;
+        if (hintTimeout) {
+          clearTimeout(hintTimeout);
+        }
+        this.curHintTimeout = setTimeout(() => {
+          this.curHint = "";
+        }, 3000);
+      }
     },
   },
   created() {
@@ -303,6 +325,7 @@ export default {
       const volumeNum = v / 100;
       if (playerObj) {
         playerObj.setVoice(volumeNum);
+        this.curHint = `音量${v}%`;
       }
       console.log("音量", volumeNum);
     },
@@ -337,7 +360,7 @@ export default {
       playerObj.onSeekFinish = () => {
         console.log("onSeekFinish", "Seek完成");
         // 播放结束重新播放
-        // this.play();
+        this.play();
         this.$refs.BASE_PROGRESS_PLAY_EL.setSeekFinish(true);
         this.curLoading = false;
       };
@@ -625,5 +648,14 @@ export default {
 }
 .base_web26_footer_control {
   flex: 1;
+}
+.base_web26_container_hint {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  font-weight: bold;
+  font-size: 28px;
+  color: rgb(136 170 247);
+  -webkit-text-stroke: 1px black;
 }
 </style>
