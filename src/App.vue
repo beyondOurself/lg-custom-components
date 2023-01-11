@@ -4,6 +4,7 @@
     <!-- <BsgBaseProgress v-model="curValue" :cacheScale="curCacheScale" /> -->
     <!-- E 进度条 -->
     <!-- S 播放组件 -->
+     <!-- <BsgBaseWeb265Loading /> -->
     <el-button @click="handlePlay">播放</el-button>
     <BsgBaseWeb265 ref="BSG_BASE_WEB265_EL" />
     <!-- E 播放组件 -->
@@ -13,11 +14,13 @@
 <script>
 // import BsgBaseProgress from "./components/bsg-base-progress.vue";
 import BsgBaseWeb265 from "./components/bsg-base-web265.vue";
+// import BsgBaseWeb265Loading  from "./components/bsg-base-web265-loading"
 export default {
   name: "App",
   components: {
     // BsgBaseProgress,
     BsgBaseWeb265,
+    // BsgBaseWeb265Loading
   },
   data() {
     return {

@@ -3,7 +3,7 @@
  * @Author: canlong.shen 562172151@qq.com
  * @Date: 2023-01-04 15:30:26
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-10 17:56:55
+ * @LastEditTime: 2023-01-11 09:13:33
  * @FilePath: \test-com\src\components\bsg-base-web265.vue
  * @Description: 
  * 
@@ -51,7 +51,9 @@
         </div>
         <!-- E 头部操作面板 -->
         <!-- S 播放内容 -->
-        <div id="glplayer" class="glplayer"></div>
+        <div id="glplayer" class="glplayer">
+          <BsgBaseWeb265Loading :loading="curLoading" />
+        </div>
         <!-- E 播放内容 -->
         <!-- S 底部操作面板 -->
         <div class="base_web26_footer">
@@ -104,6 +106,8 @@ import { Player } from "./assets/executor";
 import BsgBaseWeb265Volume from "./bsg-base-web265-volume";
 import BsgBaseProgress from "./bsg-base-progress";
 import BsgBaseWeb265Control from "./bsg-base-web265-control";
+import BsgBaseWeb265Loading from "./bsg-base-web265-loading";
+
 export default {
   name: "BsgBaseWeb265",
   model: {
@@ -138,6 +142,7 @@ export default {
     BsgBaseWeb265Volume,
     BsgBaseProgress,
     BsgBaseWeb265Control,
+    BsgBaseWeb265Loading,
   },
   data() {
     return {
@@ -152,6 +157,7 @@ export default {
       curCacheScale: 0, // 缓存器进度条
       curProgressScale: 0, // 播放器进度条
       curPlayingTime: 0, //正在播放时间
+      curLoading: false, // 缓存加载的loading
     };
   },
   computed: {
@@ -222,7 +228,7 @@ export default {
       if (playSecond >= durationSecondGet) {
         playSecond = durationSecondGet;
       }
-
+      this.curLoading = true;
       playerObj.seek(playSecond);
     },
     /**
@@ -275,14 +281,12 @@ export default {
      * @return {*}
      */
     triggerProgressUp(v = 0, flag = "") {
-      if (flag !== "progress") {
-        return;
-      }
       const { durationSecondGet: durationSecond = 0, curInstance: playerObj } =
         this;
       const scale = v ? v / 100 : 0;
       const playSecond = durationSecond * scale;
       if (playerObj) {
+        this.curLoading = true;
         playerObj.seek(playSecond);
       }
 
@@ -335,6 +339,7 @@ export default {
         // 播放结束重新播放
         // this.play();
         this.$refs.BASE_PROGRESS_PLAY_EL.setSeekFinish(true);
+        this.curLoading = false;
       };
       // YUV帧数据渲染
       playerObj.onRender = (param) => {
