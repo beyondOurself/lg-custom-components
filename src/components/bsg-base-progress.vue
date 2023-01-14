@@ -2,8 +2,8 @@
  * @Author: canlong.shen 562172151@qq.com
  * @Date: 2023-01-06 18:10:58
  * @LastEditors: canlong.shen 562172151@qq.com
- * @LastEditTime: 2023-01-11 10:16:02
- * @FilePath: \smart-cloud-fe-common\src\components\base\bsg-base-progress.vue
+ * @LastEditTime: 2023-01-11 14:13:22
+ * @FilePath: \test-com\src\components\bsg-base-progress.vue
  * @Description: 进度条组件
  * 
 -->
@@ -408,7 +408,6 @@ export default {
   background-color: rgb(255, 250, 250);
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 }
-
 .base_progress_cache {
   height: inherit;
   position: absolute;

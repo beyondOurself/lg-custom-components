@@ -1,26 +1,47 @@
 <template>
   <div id="app">
-    <!-- S 进度条 -->
-    <!-- <BsgBaseProgress v-model="curValue" :cacheScale="curCacheScale" /> -->
-    <!-- E 进度条 -->
-    <!-- S 播放组件 -->
-     <!-- <BsgBaseWeb265Loading /> -->
-    <el-button @click="handlePlay">播放</el-button>
-    <BsgBaseWeb265 ref="BSG_BASE_WEB265_EL" />
-    <!-- E 播放组件 -->
+    <!-- <div class="container">
+      <div class="list"></div>
+      <div class="list"></div>
+      <div class="list"></div>
+      <div class="list"></div>
+      <div class="list"></div>
+      <div class="list"></div>
+      <div class="list"></div>
+      <i></i><i></i><i></i><i></i><i></i>
+    </div> -->
+    <BsgBaseLayout
+      style="width: 500px; height: 1000px; background-color: red"
+      width="200"
+      height="200"
+    >
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+    </BsgBaseLayout>
   </div>
 </template>
 
 <script>
 // import BsgBaseProgress from "./components/bsg-base-progress.vue";
-import BsgBaseWeb265 from "./components/bsg-base-web265.vue";
+// import BsgBaseWeb265 from "./components/bsg-base-web265.vue";
 // import BsgBaseWeb265Loading  from "./components/bsg-base-web265-loading"
+import BsgBaseLayout from "./components/bsg-base-layout";
 export default {
   name: "App",
   components: {
     // BsgBaseProgress,
-    BsgBaseWeb265,
+    // BsgBaseWeb265,
     // BsgBaseWeb265Loading
+    BsgBaseLayout,
   },
   data() {
     return {
@@ -37,30 +58,19 @@ export default {
     //     i = 0;
     //   }
     // }, 1000);
-    
   },
-  mounted(){
+  mounted() {
     // this.$refs.BSG_BASE_WEB265_EL.initPlayer()
-    this.handlePlay()
+    // this.handlePlay();
   },
-  methods:{
-    handlePlay(){
-
-      console.log('播放了');
-      this.$refs.BSG_BASE_WEB265_EL.initPlayer()
-
-    }
-  }
+  methods: {
+    handlePlay() {
+      console.log("播放了");
+      this.$refs.BSG_BASE_WEB265_EL.initPlayer();
+    },
+  },
 };
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style >
 </style>
